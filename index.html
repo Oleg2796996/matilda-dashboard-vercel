@@ -242,16 +242,25 @@
       return { total, activeUsers, peakDay, lastActivity };
     }
 
+    function mskNow() {
+      return new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', dateStyle: 'short', timeStyle: 'short' });
+    }
+
+    function withMsk(value) {
+      if (!value || value === '—') return value;
+      return /мск/i.test(value) ? value : `${value} МСК`;
+    }
+
     function render(data) {
       const d = normalize(data);
       const summary = buildSummary(d);
       const maxCount = Math.max(1, ...d.participants.map(p => p.count));
       const maxDay = Math.max(1, ...d.days.map(dd => dd.total));
       const total = summary.total;
-      const currentTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', dateStyle: 'short', timeStyle: 'short' });
+      const currentTime = mskNow();
       const lastActivity = d.updatedAtLabel || d.updatedAt || currentTime;
 
-      els.statusBadge.textContent = `Обновлено: ${d.updatedAt}`;
+      els.statusBadge.textContent = `Сейчас в Москве: ${currentTime} МСК`;
 
       const kpis = [
         { label: 'Всего сообщений', value: fmt(total), delta: 'По всем видимым сообщениям' },
@@ -273,7 +282,7 @@
         { label: 'Среднее на участника', value: d.participants.length ? fmt(Math.round(total / d.participants.length)) : '0', delta: 'Грубая средняя активность' },
         { label: 'Всего дней', value: fmt(d.days.length), delta: 'Дней на графике' },
         { label: 'Площадка', value: 'Telegram', delta: 'Под этот чат' },
-        { label: 'Последняя активность', value: lastActivity, delta: 'Дата и время последнего события' },
+        { label: 'Последняя активность', value: withMsk(lastActivity), delta: 'Дата и время последнего события' },
       ].map(item => `
         <div class="card kpi">
           <div class="label">${item.label}</div>
@@ -319,7 +328,7 @@
           <tr>
             <td><span class="chip"><span class="dot" style="background:${p.color}"></span>${p.name}</span></td>
             <td>${p.count}</td>
-            <td>${p.last}</td>
+            <td>${withMsk(p.last)}</td>
             <td>${label}</td>
           </tr>
         `;
