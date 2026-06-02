@@ -251,7 +251,7 @@
       const currentTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', dateStyle: 'short', timeStyle: 'short' });
       const lastActivity = d.updatedAtLabel || d.updatedAt || currentTime;
 
-      els.statusBadge.textContent = `Обновлено: ${d.updatedAt}`;
+      els.statusBadge.textContent = `Обновлено: ${lastActivity}`;
 
       const kpis = [
         { label: 'Всего сообщений', value: fmt(total), delta: 'По всем видимым сообщениям' },
