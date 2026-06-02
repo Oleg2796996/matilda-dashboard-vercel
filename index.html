@@ -344,9 +344,14 @@
     async function refreshNow() {
       els.statusBadge.textContent = 'Обновляю…';
       try {
-        await fetch('refresh?ts=' + Date.now(), { cache: 'no-store' });
-      } catch (e) {}
-      await loadRemote();
+        const res = await fetch('/api/refresh?ts=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('refresh failed');
+        const data = await res.json();
+        render(data);
+        els.statusBadge.textContent = `Обновлено: ${data.updatedAt || new Date().toISOString().slice(0,10)}`;
+      } catch (e) {
+        await loadRemote();
+      }
     }
 
     els.loadSample.onclick = () => render(DEFAULT_DATA);
@@ -384,10 +389,6 @@
     // Always prefer the shared stats.json so the dashboard stays in sync.
     // Local storage is only used as an offline fallback when stats.json is unavailable.
     loadRemote();
-    setInterval(loadRemote, 15000);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') loadRemote();
-    });
   </script>
 </body>
 </html>
